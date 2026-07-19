@@ -27,16 +27,14 @@ const userSchema=mongoose.Schema({
     timestamps:true//->shows when user was created and time of everythin etc and when lastly updated
 });
 
-userSchema.pre("save",async (next)=>{
+userSchema.pre("save",async function(){
     //check if user changes password hence we hash it here
     if(!this.isModified("password")){
-        return next();
     }
 
     const hash=await bcrypt.hash(this.password,10);
     this.password= hash;
 
-    return next();
 });
 
 
