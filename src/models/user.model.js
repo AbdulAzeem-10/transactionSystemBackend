@@ -39,6 +39,7 @@ userSchema.pre("save",async function(){
 
 
 userSchema.methods.comparePassword=async function(password){
+    // console.log(password,this.password);//->testing error(*******,undefined)->we have error in this .password
     return bcrypt.compare(password,this.password);
 }
 
