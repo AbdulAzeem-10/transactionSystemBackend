@@ -1,6 +1,6 @@
 const userModel=require("../models/user.model");
 const jwt=require("jsonwebtoken");
-
+const emailService=require("../services/email.service");
 
 /**
 *- user register controller 
@@ -47,6 +47,9 @@ let {email,password,name}=req.body;
         },
         token
     })
+
+    //email will be sent when response is complete
+    await emailService.sendRegistrationEmail(user.email,user.name);//->test with postman//->small bug here was tested corrected and works 
 }
 //register api complete
 
