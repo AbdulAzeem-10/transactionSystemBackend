@@ -110,6 +110,7 @@ async function createTransaction(req, res) {
         /**
          * 5. Create transaction (PENDING)
          */
+        //creating session ->mongodb provides start session and transaction methods to ensure sequence of program flow and failure at any step will stop the 4 upcoming steps altogether to avoid any miscellaneous transactions
         const session = await mongoose.startSession()
         session.startTransaction()
 
@@ -119,7 +120,7 @@ async function createTransaction(req, res) {
             amount,
             idempotencyKey,
             status: "PENDING"
-        } ], { session }))[ 0 ]
+        } ], { session }))[ 0 ]//->session as second
 
         const debitLedgerEntry = await ledgerModel.create([ {
             account: fromAccount,
@@ -128,6 +129,7 @@ async function createTransaction(req, res) {
             type: "DEBIT"
         } ], { session })
 
+        //small wait between debit and credit to give time for uri checks
         await (() => {
             return new Promise((resolve) => setTimeout(resolve, 15 * 1000));
         })()
@@ -189,6 +191,13 @@ async function createInitialFundsTransaction(req, res) {
     const fromUserAccount = await accountModel.findOne({
         user: req.user._id
     })
+        //testing logs
+        // console.log("========== DEBUG ==========");
+        // console.log("req.user._id:", req.user._id.toString());
+        // console.log("fromUserAccount._id:", fromUserAccount?._id.toString());
+        // console.log("toAccount:", toAccount);
+        // console.log("toUserAccount._id:", toUserAccount?._id.toString());
+        // console.log("===========================");
 
     if (!fromUserAccount) {
         return res.status(400).json({
@@ -208,6 +217,12 @@ async function createInitialFundsTransaction(req, res) {
         status: "PENDING"
     })
 
+
+    // //testing ledger entries
+    // console.log("Debit Account:", fromUserAccount._id.toString());
+    // console.log("Credit Account:", toAccount.toString());
+
+
     const debitLedgerEntry = await ledgerModel.create([ {
         account: fromUserAccount._id,
         amount: amount,
@@ -215,6 +230,8 @@ async function createInitialFundsTransaction(req, res) {
         type: "DEBIT"
     } ], { session })
 
+
+    
     const creditLedgerEntry = await ledgerModel.create([ {
         account: toAccount,
         amount: amount,

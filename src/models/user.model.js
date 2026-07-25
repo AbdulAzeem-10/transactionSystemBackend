@@ -23,6 +23,13 @@ const userSchema=mongoose.Schema({
         minlength:[6,"password should contain more than 6 characters"],
         select:false//->whenever in future we require or get user data for a query password wont be part of that query with this line
     },
+    //adding system user for transaction testing
+     systemUser: {
+        type: Boolean,
+        default: false,
+        immutable: true,
+        select: false
+    }
 },{
     timestamps:true//->shows when user was created and time of everythin etc and when lastly updated
 });
