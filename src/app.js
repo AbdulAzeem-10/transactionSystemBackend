@@ -14,7 +14,9 @@ const authRouter=require("../src/routes/auth.routes");
 const accountRouter = require("./routes/account.routes");
 const transactionRouter=require("./routes/transaction.routes");
 
-
+app.get("/",(req,res)=>{
+    res.send("ledger system is active and running");
+});
 
 
 
